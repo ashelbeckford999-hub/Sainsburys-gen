@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ashel's BARCODE GEN</title>
+<style>
+:root{--c:#39ff14;--bg:#07110a;--card:#101818}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#050505;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:30px 30px;color:#fff}
+.card{width:min(520px,92vw);background:rgba(16,24,24,.9);padding:28px;border-radius:22px;border:2px solid var(--c);box-shadow:0 0 25px var(--c);text-align:center}
+h1{color:var(--c)}input,button{width:100%;padding:12px;border-radius:10px;border:none;margin:6px 0}input{background:#222;color:#fff}button{cursor:pointer;background:#0d0d0d;color:#fff}.price{width:23%;display:inline-block;background:#111;color:#fff;border:1px solid var(--c)}.toggle{background:var(--c);color:#000;font-weight:bold}.frame{background:transparent;border:1px solid var(--c);border-radius:12px;padding:15px;margin-top:12px}
+</style></head><body><div class='card'><h1>Ashel's BARCODE GEN</h1><input id='productCode' maxlength='13' placeholder='13-digit barcode' oninput="this.value=this.value.replace(/\D/g,'').slice(0,13)"><div><button class='price' onclick='setPriceAndGenerate(10)'>10p</button><button class='price' onclick='setPriceAndGenerate(49)'>49p</button><button class='price' onclick='setPriceAndGenerate(100)'>£1</button><button class='price' onclick='showCustomPrice()'>Custom</button></div><div id='customPriceContainer' style='display:none'><input id='price' type='number'><button onclick='generateBarcode()'>Generate</button></div><div class='frame'><canvas id='barcodeCanvas'></canvas></div><button class='toggle' onclick='toggleTheme()'>Change Theme</button></div>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script><script>
+const themes=[['#39ff14','#07110a'],['#00cfff','#081421'],['#ff7b00','#241100'],['#ffffff','#000000'],['#000000','#ffffff']];let t=0;
+function apply(){let[c,b]=themes[t];document.documentElement.style.setProperty('--c',c);document.body.style.background=b;if(t==4){document.body.style.color='#000';document.querySelector('.card').style.background='#fff';}else{document.body.style.color='#fff';document.querySelector('.card').style.background='rgba(16,24,24,.9)';}}
+function toggleTheme(){t=(t+1)%themes.length;apply();}
+function padLeft(s,l){return s.toString().padStart(l,'0')}
+function calculateCheckDigit(i){let s=0;for(let x=0;x<i.length;x++){let d=parseInt(i[i.length-1-x]);s+=d*((x%2===0)?3:1)}return(10-s%10)%10}
+function generateBarcode(){let p=productCode.value.replace(/\D/g,'');if(p.length<8)return alert('Enter a valid barcode');let base=`91${padLeft(p,13)}${padLeft(price.value,6)}`;JsBarcode('#barcodeCanvas',`${base}${calculateCheckDigit(base)}`,{format:'CODE128',displayValue:true,width:2,height:80});}
+function setPriceAndGenerate(v){price.value=v;customPriceContainer.style.display='none';generateBarcode();}
+function showCustomPrice(){customPriceContainer.style.display='block';}
+apply();
+</script></body></html>
